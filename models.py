@@ -20,6 +20,7 @@ np.random.seed(1)
 df_large = pd.read_csv('all_loan_data.csv')
 
 
+
 sample_size = int(0.001 * len(df_large))
 print(df_large.shape)
 # Create a representative sample
@@ -39,7 +40,7 @@ df = df.drop(
              'co_applicant_race_3', 'co_applicant_race_name_4',
              'co_applicant_race_4', 'co_applicant_race_name_5',
              'co_applicant_race_5', 'denial_reason_name_1', 'denial_reason_1', 'denial_reason_name_2',
-             'denial_reason_2', 'denial_reason_name_3', 'denial_reason_3'])
+             'denial_reason_2', 'denial_reason_name_3', "preapproval_name", 'denial_reason_3', "owner_occupancy_name", "msamd_name", "county_name", "co_applicant_ethnicity_name", "co_applicant_race_name_1"])
 df = df.dropna(axis=1, how="all")
 #encode action_taken
 df["action_taken"] = df["action_taken"].apply(lambda x: np.nan if (x == 4 or x == 5) else x)
@@ -60,12 +61,10 @@ df["applicant_ethnicity"] = df["applicant_ethnicity"].apply(lambda x: 1 if (x ==
 
 df = df.dropna()
 
-print(df["applicant_race_1"].value_counts())
+print(df.head())
 
 # one hot encode helpful columns
-categoricalFeatures = ["agency_abbr", "loan_type_name", "property_type_name", "loan_purpose_name",
-                       "owner_occupancy_name", "preapproval_name", "state_abbr", "msamd_name",
-                       "county_name", "census_tract_number", "co_applicant_ethnicity_name", "co_applicant_race_name_1",
+categoricalFeatures = ["agency_abbr", "loan_type_name", "property_type_name", "loan_purpose_name", "state_abbr",
                        "co_applicant_sex_name", "purchaser_type_name"]
 
 for feature in categoricalFeatures:

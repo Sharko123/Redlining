@@ -166,11 +166,11 @@ def bias_metrics_rf(privileged_groups, unprivileged_groups):
 # read data
 df_large = pd.read_csv('all_loan_data.csv')
 
-
 sample_size = int(0.001 * len(df_large))
 print(df_large.shape)
 # Create a representative sample
 df = df_large.sample(n=sample_size, random_state=42)
+del df_large
 print(df.shape)
 df = df.drop(
     columns=["as_of_year", "respondent_id", "agency_name", "agency_code", "loan_type", "property_type", "loan_purpose",
@@ -186,7 +186,8 @@ df = df.drop(
              'co_applicant_race_3', 'co_applicant_race_name_4',
              'co_applicant_race_4', 'co_applicant_race_name_5',
              'co_applicant_race_5', 'denial_reason_name_1', 'denial_reason_1', 'denial_reason_name_2',
-             'denial_reason_2', 'denial_reason_name_3', 'denial_reason_3'])
+             'denial_reason_2', 'denial_reason_name_3', "preapproval_name", 'denial_reason_3', "owner_occupancy_name",
+             "msamd_name", "county_name", "co_applicant_ethnicity_name", "co_applicant_race_name_1"])
 df = df.dropna(axis=1, how="all")
 #encode action_taken
 df["action_taken"] = df["action_taken"].apply(lambda x: np.nan if (x == 4 or x == 5) else x)
@@ -194,7 +195,7 @@ df["action_taken"] = df["action_taken"].apply(lambda x: 1 if (x == 1 or x == 2 o
 
 # White (1) African American (0)
 df["applicant_race_1"] = df["applicant_race_1"].apply(lambda x: np.nan if (x > 5) else x)
-df["applicant_race_1"] = df["applicant_race_1"].apply(lambda x: 1 if (x == 5) else (0 if (x==3) else np.nan))
+df["applicant_race_1"] = df["applicant_race_1"].apply(lambda x: 1 if (x == 5) else (0 if (x == 3) else np.nan))
 
 # Male (1) Female (0)
 df["applicant_sex"] = df["applicant_sex"].apply(lambda x: np.nan if (x > 2) else x)
@@ -204,24 +205,17 @@ df["applicant_sex"] = df["applicant_sex"].apply(lambda x: 1 if (x == 1) else 0)
 df["applicant_ethnicity"] = df["applicant_ethnicity"].apply(lambda x: np.nan if (x > 2) else x)
 df["applicant_ethnicity"] = df["applicant_ethnicity"].apply(lambda x: 1 if (x == 2) else 0)
 
-
 df = df.dropna()
 
-print(df["applicant_race_1"].value_counts())
+print(df.head())
 
 # one hot encode helpful columns
-categoricalFeatures = ["agency_abbr", "loan_type_name", "property_type_name", "loan_purpose_name",
-                       "owner_occupancy_name", "preapproval_name", "state_abbr", "msamd_name",
-                       "county_name", "census_tract_number", "co_applicant_ethnicity_name", "co_applicant_race_name_1",
+categoricalFeatures = ["agency_abbr", "loan_type_name", "property_type_name", "loan_purpose_name", "state_abbr",
                        "co_applicant_sex_name", "purchaser_type_name"]
-
 for feature in categoricalFeatures:
     onehot = pd.get_dummies(df[feature], prefix=feature)
     df = df.drop(feature, axis=1)
     df = df.join(onehot)
-
-
-
 
 # ----------------------------------
 #        FAIRNESS FOR RACE
@@ -262,7 +256,6 @@ binaryLabelDataset = aif360.datasets.BinaryLabelDataset(
 privileged_groups = [{'applicant_sex': 1}]
 unprivileged_groups = [{'applicant_sex': 0}]
 
-
 print(
     '\n\n--------------------------------\n RANDOM FOREST SEX vs ACTION_TAKEN BIAS METRICS\n--------------------------------')
 
@@ -283,7 +276,6 @@ binaryLabelDataset = aif360.datasets.BinaryLabelDataset(
 # Unpriviliged group: Female (0)
 privileged_groups = [{'applicant_ethnicity': 1}]
 unprivileged_groups = [{'applicant_ethnicity': 0}]
-
 
 print(
     '\n\n--------------------------------\n RANDOM FOREST ETHNICITY vs ACTION_TAKEN SCORE BIAS METRICS\n--------------------------------')
