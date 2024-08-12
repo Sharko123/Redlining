@@ -27,45 +27,38 @@ print(df_large.shape)
 df = df_large.sample(n=sample_size, random_state=42)
 print(df.shape)
 df = df.drop(
-    columns=["as_of_year", "respondent_id", "agency_name", "agency_code", "loan_type", "property_type", "loan_purpose",
-             "owner_occupancy", "preapproval",
-             "action_taken_name", "msamd", "state_name", "state_code", "county_code", "applicant_ethnicity_name",
-             "co_applicant_ethnicity",
-             "applicant_race_name_1", "applicant_sex_name", "co_applicant_sex", "purchaser_type", "hoepa_status",
-             "hoepa_status_name", "lien_status", "lien_status_name",
-             "rate_spread", 'applicant_race_name_2', 'applicant_race_2', 'applicant_race_name_3',
-             'applicant_race_3', 'applicant_race_name_4', 'applicant_race_4',
-             'applicant_race_name_5', 'applicant_race_5', 'co_applicant_race_name_2',
-             'co_applicant_race_2', 'co_applicant_race_name_3',
-             'co_applicant_race_3', 'co_applicant_race_name_4',
-             'co_applicant_race_4', 'co_applicant_race_name_5',
-             'co_applicant_race_5', 'denial_reason_name_1', 'denial_reason_1', 'denial_reason_name_2',
-             'denial_reason_2', 'denial_reason_name_3', "preapproval_name", 'denial_reason_3', "owner_occupancy_name", "msamd_name", "county_name", "co_applicant_ethnicity_name", "co_applicant_race_name_1"])
+    columns=["activity_year", "lei", "derived_msa", "county_code", "census_tract", "conforming", "loan_to_value_ratio", "rate_spread", "total_points_and_fees",
+             "prepayment_penalty_term", "intro_rate_period", "multifamily_affordable_units", "applicant_ethnicity-2", "applicant_ethnicity-3", "applicant_ethnicity-4", "applicant_ethnicity-5",
+             "co-applicant_ethnicity-2", "co-applicant_ethnicity-3", "co-applicant_ethnicity-4", "co-applicant_ethnicity-5", "applicant_race-2", "applicant_race-3", "applicant_race-4", "applicant_race-5",
+             "co-applicant_race-2", "co-applicant_race-3", "co-applicant_race-4", "co-applicant_race-5", "applicant_ethnicity_observed", "co-applicant_ethnicity_observed",
+             "applicant_age_above_62", "co-applicant_age_above_62", "applicant_race_1", "co-applicant_race_1", "applicant_sex_1", "co-applicant_sex_1", "applicant_ethnicity_1", "co-applicant_ethnicity_1"
+             , "aus-1", "aus-2", "aus-3", "aus-4", "aus-5", "denial_reason-1", "denial_reason-2", "denial_reason-3", "denial_reason-4"])
 df = df.dropna(axis=1, how="all")
 #encode action_taken
 df["action_taken"] = df["action_taken"].apply(lambda x: np.nan if (x == 4 or x == 5) else x)
-df["action_taken"] = df["action_taken"].apply(lambda x: 1 if (x == 1 or x == 2 or x == 6 or x == 8) else 0)
+df["action_taken"] = df["action_taken"].apply(lambda x: "Accepted" if (x == 1 or x == 2 or x == 6 or x == 8) else "Rejected")
 
 # White (1) African American (0)
-df["applicant_race_1"] = df["applicant_race_1"].apply(lambda x: np.nan if (x > 5) else x)
-df["applicant_race_1"] = df["applicant_race_1"].apply(lambda x: 1 if (x == 5) else (0 if (x==3) else np.nan))
 
 # Male (1) Female (0)
 df["applicant_sex"] = df["applicant_sex"].apply(lambda x: np.nan if (x > 2) else x)
-df["applicant_sex"] = df["applicant_sex"].apply(lambda x: 1 if (x == 1) else 0)
+df["applicant_sex"] = df["applicant_sex"].apply(lambda x: "Male" if (x == 1) else "Female")
 
 # Non Latino/Hispanic Ethnicity (1) Latino/Hispanic Ethnicity (0)
-df["applicant_ethnicity"] = df["applicant_ethnicity"].apply(lambda x: np.nan if (x > 2) else x)
-df["applicant_ethnicity"] = df["applicant_ethnicity"].apply(lambda x: 1 if (x == 2) else 0)
-
+# df["applicant_ethnicity"] = df["applicant_ethnicity"].apply(lambda x: np.nan if (x > 2) else x)
+df["derived_ethnicity"] = df["derived_ethnicity"].apply(lambda x: "Not Provided" if (x == "Ethnicity Not Available") or (x=="Free Form Text Only") else x)
+df["derived_sex"] = df["derived_sex"].apply(lambda x: "Not Provided" if (x == "Sex Not Available") else x)
+df["derived_race"] = df["derived_race"].apply(lambda x: np.nan if  (x == "Race Not Available") or (x=="Free Form Text Only") else x)
+df["derived_race"] = df["derived_race"].apply(lambda x: "American Indian" if (x == "American Indian or Alaska Native") else x)
+df["derived_race"] = df["derived_race"].apply(lambda x: "Native Hawaiian" if (x == "Native Hawaiian or Other Pacific Islander") else x)
 
 df = df.dropna()
 
-print(df.head())
 
 # one hot encode helpful columns
-categoricalFeatures = ["agency_abbr", "loan_type_name", "property_type_name", "loan_purpose_name", "state_abbr",
-                       "co_applicant_sex_name", "purchaser_type_name"]
+categoricalFeatures = ["state_code", "derived_loan_product_type", "derived_dwelling_category", "purchaser_type",
+                       "preapproval", "loan_type", "loan_purpose", "lien_status", "reverse_mortgage", "open-end_line_of_credit",
+                       "business_or_commercial_purpose", "hoepa_status", "submission_of_application", "initially_payable_to_institution"]
 
 for feature in categoricalFeatures:
     onehot = pd.get_dummies(df[feature], prefix=feature)
