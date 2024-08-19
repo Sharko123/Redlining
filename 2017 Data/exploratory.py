@@ -12,7 +12,7 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import classification_report, precision_score, recall_score, accuracy_score, f1_score
 
-df_large = pd.read_csv('2017 Data/all_loan_data.csv')
+df_large = pd.read_csv('all_loan_data.csv')
 
 
 sample_size = int(0.001 * len(df_large))

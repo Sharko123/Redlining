@@ -164,7 +164,7 @@ def bias_metrics_rf(privileged_groups, unprivileged_groups):
 # ----------------------------------
 
 # read data
-df_large = pd.read_csv('2017 Data/all_loan_data.csv')
+df_large = pd.read_csv('all_loan_data.csv')
 
 sample_size = int(0.001 * len(df_large))
 print(df_large.shape)

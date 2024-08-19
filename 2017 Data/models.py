@@ -17,7 +17,7 @@ np.random.seed(1)
 
 # %%
 # read data
-df_large = pd.read_csv('2017 Data/all_loan_data.csv')
+df_large = pd.read_csv('all_loan_data.csv')
 
 
 
