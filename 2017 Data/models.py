@@ -11,6 +11,9 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import classification_report, precision_score, recall_score, accuracy_score, f1_score
 
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Dense, Dropout
+
 import tensorflow as tf
 
 np.random.seed(1)
@@ -133,7 +136,7 @@ print('F1 Score: %.4f' % f1_score(y_test, y_pred))
 print("Random Forest")
 
 rf = RandomForestClassifier(n_estimators = 1000, random_state = 42)
-rf.fit(X_train, y_train);
+rf.fit(X_train, y_train)
 y_pred = rf.predict(X_test)
 
 cnf_matrix = metrics.confusion_matrix(y_test, y_pred)
@@ -190,7 +193,9 @@ print('Recall: %.4f' % recall_score(y_test, y_pred))
 print('F1 Score: %.4f' % f1_score(y_test, y_pred))
 
 
-
+#####################################################################################################
+###                                RBF SVM                                         ###
+#####################################################################################################
 print("RBF SVM")
 
 clf = svm.SVC(kernel='rbf', max_iter=10000) # Linear Kernel
@@ -218,3 +223,63 @@ print('Accuracy: %.4f' % accuracy_score(y_test, y_pred))
 print('Precision: %.4f' % precision_score(y_test, y_pred))
 print('Recall: %.4f' % recall_score(y_test, y_pred))
 print('F1 Score: %.4f' % f1_score(y_test, y_pred))
+
+
+
+#####################################################################################################
+###                                Neural Network                                       ###
+#####################################################################################################
+X_train = np.array(X_train).astype(np.float32)
+X_test = np.array(X_test).astype(np.float32)
+y_train = np.array(y_train).astype(np.int32)
+y_test = np.array(y_test).astype(np.int32)
+
+
+print("Neural Network")
+
+# Defining the model
+model = Sequential()
+
+# Adding the input layer and the first hidden layer
+model.add(Dense(64, input_dim=X_train.shape[1], activation='relu'))
+model.add(Dropout(0.5))  # Dropout to prevent overfitting
+
+# Adding the second hidden layer
+model.add(Dense(32, activation='relu'))
+model.add(Dropout(0.5))
+
+# Adding the output layer
+model.add(Dense(1, activation='sigmoid'))
+
+# Compiling the model
+model.compile(optimizer='adam',
+              loss='binary_crossentropy',
+              metrics=['accuracy'])
+
+# Training the model
+history = model.fit(X_train, y_train, epochs=30, batch_size=32, validation_split=0.2, verbose=1)
+
+# Predicting on the test set
+y_pred1 = model.predict(X_test)
+y_pred1 = (y_pred1 > 0.5).astype(int)
+
+cnf_matrix = metrics.confusion_matrix(y_test, y_pred)
+class_names=[0,1] # name  of classes
+fig, ax = plt.subplots()
+tick_marks = np.arange(len(class_names))
+plt.xticks(tick_marks, class_names)
+plt.yticks(tick_marks, class_names)
+# create heatmap
+sns.heatmap(pd.DataFrame(cnf_matrix), annot=True, cmap="YlGnBu" ,fmt='g')
+ax.xaxis.set_label_position("top")
+plt.tight_layout()
+plt.title('Confusion matrix', y=1.1)
+plt.ylabel('Actual label')
+plt.xlabel('Predicted label')
+
+print('Accuracy: %.4f' % accuracy_score(y_test, y_pred1))
+print('Precision: %.4f' % precision_score(y_test, y_pred1))
+print('Recall: %.4f' % recall_score(y_test, y_pred1))
+print('F1 Score: %.4f' % f1_score(y_test, y_pred1))
+
+print(list(y_pred1) == list(y_pred))
