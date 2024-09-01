@@ -88,7 +88,7 @@ np.random.seed(1)
 
 # df.to_csv("data23.csv")
 
-df = pd.read_csv("data23.csv")
+df = pd.read_csv("2023 Data/data23.csv")
 
 # %%
 # Labels are the values we want to predict
