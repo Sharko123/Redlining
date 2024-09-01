@@ -5,7 +5,7 @@ import numpy as np
 plt.rcParams.update({'font.size': 14})
 
 groups = ['Race', 'Sex', 'Ethnicity']
-metrics = ['Statistical Parity Difference', 'Disparate Impact']
+metrics = ['Statistical Parity Difference', 'Disparate Impact', 'Theil Index']
 before_reweighing = np.array([
     [0.1460, 0.7509],
     [0.0679, 0.8866],

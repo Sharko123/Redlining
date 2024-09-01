@@ -11,16 +11,18 @@ def compute_metrics(dataset_true, dataset_pred,
                                                  unprivileged_groups=unprivileged_groups,
                                                  privileged_groups=privileged_groups)
     metrics = OrderedDict()
+    fin = OrderedDict()
     metrics["Balanced accuracy"] = 0.5*(classified_metric_pred.true_positive_rate()+
                                              classified_metric_pred.true_negative_rate())
     metrics["Statistical parity difference"] = classified_metric_pred.statistical_parity_difference()
+    fin["Statistical parity difference"] = classified_metric_pred.statistical_parity_difference()
     metrics["Disparate impact"] = classified_metric_pred.disparate_impact()
+    fin["Disparate impact"] = classified_metric_pred.disparate_impact()
     metrics["Average odds difference"] = classified_metric_pred.average_odds_difference()
     metrics["Equal opportunity difference"] = classified_metric_pred.equal_opportunity_difference()
     metrics["Theil index"] = classified_metric_pred.theil_index()
-    
+    fin["Theil index"] = classified_metric_pred.theil_index()
     if disp:
         for k in metrics:
             print("\n%s = %.4f" % (k, metrics[k]))
-    
-    return metrics
+    return metrics, fin
