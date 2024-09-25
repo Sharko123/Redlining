@@ -170,7 +170,7 @@ def bias_metrics_rf(privileged_groups, unprivileged_groups):
 
 df= pd.read_csv('2023 Data/data23.csv')
 
-# sample_size = int(0.1*len(df_large))
+# sample_size = int(0.001*len(df_large))
 # print(df_large.shape)
 # # Create a representative sample
 # df = df_large.sample(n=sample_size, random_state=42)
